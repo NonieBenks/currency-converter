@@ -1,1 +1,32 @@
-<p>main works!</p>
+<div class="container">
+    <div class="inputs">
+        <mat-form-field>
+            <mat-label>Обмінюю</mat-label>
+            <input type="number" matInput [(ngModel)]="firstCurrency" placeholder="0">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Отримую</mat-label>
+            <input type="number" matInput placeholder="0">
+        </mat-form-field>
+    </div>
+    
+    <div class="currencies">
+        <mat-form-field>
+            <mat-label>Обмінюю</mat-label>
+            <mat-select>
+                @for (currency of currencies; track $index) {
+                    <mat-option [value]="currency">{{currency}}</mat-option>
+                  }
+            </mat-select>
+        </mat-form-field>
+    
+        <mat-form-field>
+            <mat-label>Отримую</mat-label>
+            <mat-select>
+                @for (currency of currencies; track $index) {
+                    <mat-option [value]="currency">{{currency}}</mat-option>
+                  }
+            </mat-select>
+        </mat-form-field>
+    </div>
+</div>
