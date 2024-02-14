@@ -2,11 +2,11 @@
     <div class="inputs">
         <mat-form-field>
             <mat-label>Обмінюю</mat-label>
-                <input type="text" [value]="this.inputAmount | number:'1.2-2'" formControlName="giveAmount" name="give-amount" matInput placeholder="0">
+                <input type="text" [value]="this.giveCalculatedValue" formControlName="giveAmount" name="give-amount" matInput placeholder="0">
         </mat-form-field>
         <mat-form-field>
             <mat-label>Отримую</mat-label>
-            <input type="text" [value]="this.outputAmount | number:'1.2-2'" formControlName="receiveAmount" name="receive-amount" matInput placeholder="0">
+            <input type="text" [value]="this.receiveCalculatedValue" (input)="onInput()" formControlName="receiveAmount" name="receive-amount" matInput placeholder="0">
         </mat-form-field>
     </div>
     
@@ -14,8 +14,8 @@
         <mat-form-field>
             <mat-label>Обмінюю</mat-label>
             <mat-select formControlName="giveCurrency" name="give-currency">
-                @for (currency of this.exchangeRates; track currency.ccy) {
-                    <mat-option [value]="currency.ccy">{{currency.ccy}}</mat-option>
+                @for (rateItem of this.exchangeRates; track rateItem.ccy) {
+                    <mat-option [value]="rateItem.ccy">{{rateItem.ccy}}</mat-option>
                   }
             </mat-select>
         </mat-form-field>
