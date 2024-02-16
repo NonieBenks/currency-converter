@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 
 import { CurrencyService } from '../services/currency.service';
 
@@ -8,15 +8,19 @@ import { CurrencyService } from '../services/currency.service';
   standalone: true,
   imports: [DecimalPipe],
   templateUrl: './header.component.html',
-  styleUrl: './header.component.scss'
+  styleUrl: './header.component.scss',
 })
-export class HeaderComponent implements OnInit{
+export class HeaderComponent implements OnInit {
   exchangeRates: any[] = [];
   constructor(private currencyService: CurrencyService) {}
 
   ngOnInit(): void {
-     this.currencyService.getData().subscribe((currencies) => {
-        this.exchangeRates = currencies;
+    this.fetchExhangeRates();
+  }
+
+  fetchExhangeRates() {
+    this.currencyService.getApiData().subscribe((data) => {
+      this.exchangeRates = data;
     });
   }
 }

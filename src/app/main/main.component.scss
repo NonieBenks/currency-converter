@@ -10,7 +10,11 @@
     div {
         display: flex;
         justify-content: space-around;
-        width: 50vw;
+        width: 90vw;
+        gap: 10px;
+        @media screen and (min-width: 900px) {
+            width: 50vw;
+        }
         &.currencies {
             mat-label {
                 height: 2em;

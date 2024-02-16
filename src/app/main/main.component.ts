@@ -1,81 +1,74 @@
-import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatInputModule } from '@angular/material/input';
 import { Component } from '@angular/core';
-
-import { map, tap } from 'rxjs';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 
 import { CurrencyService } from '../services/currency.service';
 
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [ MatSelectModule, MatFormFieldModule, MatInputModule, FormsModule, ReactiveFormsModule ],
+  imports: [
+    MatSelectModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
   templateUrl: './main.component.html',
-  styleUrl: './main.component.scss'
+  styleUrl: './main.component.scss',
 })
 export class MainComponent {
-  giveCalculatedValue: string = '';
-  receiveCalculatedValue: string = '';
-
-  currencyForm = this.fb.group({
-    giveCurrency: [''],
-    receiveCurrency: [''],
-    giveAmount: [0],
-    receiveAmount: [0]
-  });
+  giveCalculatedValue = 0;
+  receiveCalculatedValue = 0;
+  giveCurrency = 'UAH';
+  receiveCurrency = 'USD';
 
   exchangeRates: any[] = [];
 
-  constructor(private currencyService: CurrencyService, private fb: FormBuilder) {}
+  constructor(private currencyService: CurrencyService) {}
 
   ngOnInit(): void {
-    const sourceApi$ = this.currencyService.getData();
-    const uahValue = {
-      base_ccy: "UAH",
-      buy: "1",
-      ccy: "UAH",
-      sale: "1"
-    };
+    this.fetchExhangeRate();
+  }
 
-    const allCurrencies = sourceApi$.pipe(
-      map(array => [...array, uahValue])
-    );
-
-    allCurrencies.subscribe((c) => {
-      this.exchangeRates = c;
+  fetchExhangeRate() {
+    this.currencyService.getFullData().subscribe((data) => {
+      this.exchangeRates = data;
     });
-
-    this.currencyForm = this.fb.group({
-      giveCurrency: [this.exchangeRates[0].ccy],
-      receiveCurrency: [this.exchangeRates[1].ccy],
-      giveAmount: [0],
-      receiveAmount: [0]
-    });
-
-
-    this.currencyForm.valueChanges.pipe(tap((form) => {
-      this.receiveCalculatedValue = this.calculateExchange(form.giveAmount, form.giveCurrency, form.receiveCurrency).toFixed(2);
-    })).subscribe();
- }
-
- onInput() {
-    this.giveCalculatedValue = 
-    this.calculateExchange(this.currencyForm.get('receiveAmount')?.value, this.currencyForm.get('receiveCurrency')?.value, this.currencyForm.get('giveCurrency')?.value).toFixed(2);
- }
-
-  calculateExchange(inputAmount?: number | null, inputCurrency?: string | null, outputCurrency?: string | null) {
-    let inputObject, outputObject = this.exchangeRates[0];
+  }
+  calculateGiveAmount() {
+    let inputObject,
+      outputObject = this.exchangeRates[0];
 
     this.exchangeRates.forEach((item) => {
-      if(item.ccy === inputCurrency) {
+      if (item.ccy === this.receiveCurrency) {
         inputObject = item;
       }
-      if (item.ccy === outputCurrency) {
+      if (item.ccy === this.giveCurrency) {
         outputObject = item;
       }
     });
-    return (inputAmount!*inputObject!.buy) / outputObject.sale;
+    const result =
+      (this.receiveCalculatedValue! * inputObject!.sale) / outputObject.buy;
+    this.giveCalculatedValue = Math.round(result * 10 ** 2) / 10 ** 2;
+  }
+
+  calculateReceiveAmount() {
+    let inputObject,
+      outputObject = this.exchangeRates[0];
+
+    this.exchangeRates.forEach((item) => {
+      if (item.ccy === this.giveCurrency) {
+        inputObject = item;
+      }
+      if (item.ccy === this.receiveCurrency) {
+        outputObject = item;
+      }
+    });
+    const result =
+      (this.giveCalculatedValue! * inputObject!.sale) / outputObject.buy;
+    this.receiveCalculatedValue = Math.round(result * 10 ** 2) / 10 ** 2;
   }
 }

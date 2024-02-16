@@ -1,7 +1,7 @@
 <div class="container">
     <h2>Конвертер валют</h2>
     <div class="currency-table">
-        <div>Курс валют НБУ:</div>
+        <div class="heading">Курс валют НБУ:</div>
             @if(exchangeRates) {
                 @for (item of exchangeRates; track item.ccy) {
                         <div>{{item.ccy}} {{ item.sale | number:'1.2-2' }}</div>
