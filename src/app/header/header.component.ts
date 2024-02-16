@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CurrencyService } from '../services/currency.service';
 
 @Component({
@@ -11,7 +12,9 @@ import { CurrencyService } from '../services/currency.service';
   styleUrl: './header.component.scss',
 })
 export class HeaderComponent implements OnInit {
+  private destroyRef = inject(DestroyRef);
   exchangeRates: any[] = [];
+
   constructor(private currencyService: CurrencyService) {}
 
   ngOnInit(): void {
@@ -19,8 +22,11 @@ export class HeaderComponent implements OnInit {
   }
 
   fetchExhangeRates() {
-    this.currencyService.getApiData().subscribe((data) => {
-      this.exchangeRates = data;
-    });
+    this.currencyService
+      .getApiData()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        this.exchangeRates = data;
+      });
   }
 }
