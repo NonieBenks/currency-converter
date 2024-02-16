@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -20,6 +21,7 @@ import { CurrencyService } from '../services/currency.service';
   styleUrl: './main.component.scss',
 })
 export class MainComponent {
+  private destroyRef = inject(DestroyRef);
   giveCalculatedValue = 0;
   receiveCalculatedValue = 0;
   giveCurrency = 'UAH';
@@ -34,9 +36,12 @@ export class MainComponent {
   }
 
   fetchExhangeRate() {
-    this.currencyService.getFullData().subscribe((data) => {
-      this.exchangeRates = data;
-    });
+    this.currencyService
+      .getFullData()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        this.exchangeRates = data;
+      });
   }
   calculateGiveAmount() {
     let inputObject,
@@ -51,7 +56,7 @@ export class MainComponent {
       }
     });
     const result =
-      (this.receiveCalculatedValue! * inputObject!.sale) / outputObject.buy;
+      (this.receiveCalculatedValue! * inputObject!.buy) / outputObject.sale;
     this.giveCalculatedValue = Math.round(result * 10 ** 2) / 10 ** 2;
   }
 
@@ -68,7 +73,7 @@ export class MainComponent {
       }
     });
     const result =
-      (this.giveCalculatedValue! * inputObject!.sale) / outputObject.buy;
+      (this.giveCalculatedValue! * inputObject!.buy) / outputObject.sale;
     this.receiveCalculatedValue = Math.round(result * 10 ** 2) / 10 ** 2;
   }
 }
