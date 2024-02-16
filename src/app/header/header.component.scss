@@ -5,10 +5,25 @@
     background-color: #3A5541;
     color: white;
     height: 10vh;
-    padding: 0 15px;
+    gap: 10px;
+    padding: 0 20px;
     .currency-table {
+        @media screen and (max-width: 568px) {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
+            grid-template-areas:
+                'heading heading'
+                'item1 item2';
+            gap: 5px;
+            align-items: center;
+            .heading {
+                grid-area: heading;
+            }
+        }
         display: flex;
         align-items: center;
+        gap: 10px;
     }
     h2 {
         margin: 0;
